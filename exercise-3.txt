@@ -1,0 +1,5 @@
+//Exercise 3: delete decodemtl_test
+
+mysql> DROP DATABASE decodemtl_test;
+    Result:
+    Query OK, 0 rows affected (0.01 sec)
