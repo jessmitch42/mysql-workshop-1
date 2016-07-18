@@ -1,0 +1,7 @@
+$ CREATE DATABASE decodemtl_test;
+    Result:
+    Query OK, 1 row affected (0.01 sec)
+    
+$ CREATE DATABASE decodemtl_test;
+    Result:
+    Query OK, 1 row affected (0.01 sec)
