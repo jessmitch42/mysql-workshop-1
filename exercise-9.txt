@@ -1,0 +1,100 @@
+Exercise 9
+
+Create a data model representing a Barn with Chickens 🐣
+This model should provide answers to the following questions:
+How many rooster, hen and chicks existed in the Barn on a specific date
+How many chicks will come to age on a specific date
+
+
+
+CREATE TABLE barn (
+    id INT AUTO_INCREMENT PRIMARY KEY, 
+    birthdate DATETIME,
+    type ENUM ("hen", "chick", "rooster")
+);
+        Query OK, 0 rows affected (0.00 sec)
+        
+mysql> INSERT INTO barn (birthdate, type) VALUES
+("2000-06-18", "rooster"),
+("2014-05-11", "hen"),
+("2015-11-01", "hen"),
+("2015-12-31", "hen"),
+("2016-01-09", "rooster"),
+("2016-02-30", "rooster"),
+("2016-05-10", "chick"),
+("2016-06-29", "chick"),
+("2016-07-18", "chick"),
+("2016-07-18", "hen"),
+("2016-07-18", "chick");
+
+
+
+        Query OK, 11 rows affected, 1 warning (0.00 sec)
+        Records: 11  Duplicates: 0  Warnings: 1
+        
+mysql> SELECT * FROM barn
+    -> ;
+    +----+---------------------+---------+
+    | id | birthdate           | type    |
+    +----+---------------------+---------+
+    |  1 | 2000-06-18 00:00:00 | rooster |
+    |  2 | 2014-05-11 00:00:00 | hen     |
+    |  3 | 2015-11-01 00:00:00 | hen     |
+    |  4 | 2015-12-31 00:00:00 | hen     |
+    |  5 | 2016-01-09 00:00:00 | rooster |
+    |  6 | 0000-00-00 00:00:00 | rooster |
+    |  7 | 2016-05-10 00:00:00 | chick   |
+    |  8 | 2016-06-29 00:00:00 | chick   |
+    |  9 | 2016-07-18 00:00:00 | chick   |
+    | 10 | 2016-07-18 00:00:00 | hen     |
+    | 11 | 2016-07-18 00:00:00 | chick   |
+    +----+---------------------+---------+
+    11 rows in set (0.00 sec)
+    
+    
+//Order by birthdate
+
+mysql> SELECT * FROM barn ORDER BY birthdate;
+    +----+---------------------+---------+
+    | id | birthdate           | type    |
+    +----+---------------------+---------+
+    |  6 | 0000-00-00 00:00:00 | rooster |
+    |  1 | 2000-06-18 00:00:00 | rooster |
+    |  2 | 2014-05-11 00:00:00 | hen     |
+    |  3 | 2015-11-01 00:00:00 | hen     |
+    |  4 | 2015-12-31 00:00:00 | hen     |
+    |  5 | 2016-01-09 00:00:00 | rooster |
+    |  7 | 2016-05-10 00:00:00 | chick   |
+    |  8 | 2016-06-29 00:00:00 | chick   |
+    |  9 | 2016-07-18 00:00:00 | chick   |
+    | 10 | 2016-07-18 00:00:00 | hen     |
+    | 11 | 2016-07-18 00:00:00 | chick   |
+    +----+---------------------+---------+
+    11 rows in set (0.00 sec)
+    
+//animals born before certain date (2016 in this example)
+
+mysql> SELECT * FROM barn WHERE birthdate < "2016";
+    +----+---------------------+---------+
+    | id | birthdate           | type    |
+    +----+---------------------+---------+
+    |  1 | 2000-06-18 00:00:00 | rooster |
+    |  2 | 2014-05-11 00:00:00 | hen     |
+    |  3 | 2015-11-01 00:00:00 | hen     |
+    |  4 | 2015-12-31 00:00:00 | hen     |
+    |  6 | 0000-00-00 00:00:00 | rooster |
+    +----+---------------------+---------+
+    5 rows in set, 1 warning (0.00 sec)
+
+//Chicks born this year ("coming of age"): 
+
+mysql> SELECT * FROM barn WHERE birthdate > "2016" AND type = "chick";
+    +----+---------------------+-------+
+    | id | birthdate           | type  |
+    +----+---------------------+-------+
+    |  7 | 2016-05-10 00:00:00 | chick |
+    |  8 | 2016-06-29 00:00:00 | chick |
+    |  9 | 2016-07-18 00:00:00 | chick |
+    | 11 | 2016-07-18 00:00:00 | chick |
+    +----+---------------------+-------+
+    4 rows in set, 1 warning (0.00 sec)
