@@ -1,0 +1,5 @@
+//exercise 6: remove table "Test"
+
+mysql> DROP TABLE Test;
+    Query OK, 0 rows affected (0.00 sec)
+
