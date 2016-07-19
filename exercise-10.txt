@@ -1,0 +1,114 @@
+Exercise 10 (Workshop Challenge)
+
+Create a data model representing a Hotel with Floors and Rooms 🏨
+This model should provide answers to the following questions:
+ - The list of Rooms available for rent on a specific date
+ - The list of Rooms which can be occupied by at least 3 people on a specific date
+ - The amount of unrentable Rooms (janitor closets, public laundry room, gym, etc.)
+ - The amount of Rooms having a private Kitchen
+ - The average amount of windows per Floor
+ - The amount of Floors having Rooms with carpets
+ 
+ CREATE TABLE room (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    capacity INT,
+    rentable BOOL, 
+    private_kitchen BOOL,
+    carpet BOOL,
+    num_windows INT,
+    floor INT);
+    
+CREATE TABLE availabiilty (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    room_id INT,
+    start_time DATETIME,
+    end_time DATETIME, 
+    FOREIGN KEY (room_id) REFERENCES room(id)
+    );    
+    
+INSERT INTO room (capacity, rentable, private_kitchen, carpet, num_windows, floor) 
+    VALUES (4, TRUE, TRUE, FALSE, 5, 2),  
+        (4, TRUE, TRUE, FALSE, 1, 1), 
+        (0, FALSE, FALSE, FALSE, 2, 2), 
+        (5, TRUE, TRUE, FALSE, 5, 3), 
+        (2, TRUE, FALSE, TRUE, 5, 2), 
+        (1, TRUE, FALSE, TRUE, 3, 1),
+        (0, FALSE, FALSE, FALSE, 1, 2);
+        
+INSERT INTO availability (room_id, start_time, end_time) 
+    VALUES 
+        (1, "2016-07-19 09:00:00", "2016-07-23 17:00:00"),
+        (2, "2016-07-20 09:00:00", "2016-07-21 17:00:00"),
+        (5, "2016-07-22 09:00:00", "2016-07-28 17:00:00"),
+        (5, "2016-07-19 09:00:00", "2016-07-22 17:00:00");
+        
+ANSWERS: 
+
+//availability
+
+mysql> SELECT * FROM room r JOIN availability a ON r.id=a.room_id WHERE start_time IS NOT NULL;
+    +----+----------+----------+-----------------+--------+-------------+-------+----+---------+---------------------+---------------------+
+    | id | capacity | rentable | private_kitchen | carpet | num_windows | floor | id | room_id | start_time          | end_time            |
+    +----+----------+----------+-----------------+--------+-------------+-------+----+---------+---------------------+---------------------+
+    |  1 |        4 |        1 |               1 |      0 |           5 |     2 |  1 |       1 | 2016-07-19 09:00:00 | 2016-07-23 17:00:00 |
+    |  2 |        4 |        1 |               1 |      0 |           1 |     1 |  2 |       2 | 2016-07-20 09:00:00 | 2016-07-21 17:00:00 |
+    |  5 |        2 |        1 |               0 |      1 |           5 |     2 |  3 |       5 | 2016-07-22 09:00:00 | 2016-07-28 17:00:00 |
+    |  5 |        2 |        1 |               0 |      1 |           5 |     2 |  4 |       5 | 2016-07-19 09:00:00 | 2016-07-22 17:00:00 |
+    +----+----------+----------+-----------------+--------+-------------+-------+----+---------+---------------------+---------------------+
+    4 rows in set (0.00 sec)
+    
+//can host at least 3 people on specific date
+
+mysql> SELECT * FROM room r JOIN availability a ON r.id=a.room_id WHERE start_time IS NOT NULL AND capacity > 2;
+    +----+----------+----------+-----------------+--------+-------------+-------+----+---------+---------------------+---------------------+
+    | id | capacity | rentable | private_kitchen | carpet | num_windows | floor | id | room_id | start_time          | end_time            |
+    +----+----------+----------+-----------------+--------+-------------+-------+----+---------+---------------------+---------------------+
+    |  1 |        4 |        1 |               1 |      0 |           5 |     2 |  1 |       1 | 2016-07-19 09:00:00 | 2016-07-23 17:00:00 |
+    |  2 |        4 |        1 |               1 |      0 |           1 |     1 |  2 |       2 | 2016-07-20 09:00:00 | 2016-07-21 17:00:00 |
+    +----+----------+----------+-----------------+--------+-------------+-------+----+---------+---------------------+---------------------+
+    2 rows in set (0.00 sec)
+
+// not rentable rooms
+
+mysql> SELECT * FROM room WHERE rentable = FALSE;
+    +----+----------+----------+-----------------+--------+-------------+-------+
+    | id | capacity | rentable | private_kitchen | carpet | num_windows | floor |
+    +----+----------+----------+-----------------+--------+-------------+-------+
+    |  3 |        0 |        0 |               0 |      0 |           2 |     2 |
+    |  7 |        0 |        0 |               0 |      0 |           1 |     2 |
+    +----+----------+----------+-----------------+--------+-------------+-------+
+    2 rows in set (0.00 sec)
+
+//private kitchen = true
+
+mysql> SELECT * FROM room r JOIN availability a ON r.id=a.room_id WHERE private_kitchen = TRUE;
+    +----+----------+----------+-----------------+--------+-------------+-------+----+---------+---------------------+---------------------+
+    | id | capacity | rentable | private_kitchen | carpet | num_windows | floor | id | room_id | start_time          | end_time            |
+    +----+----------+----------+-----------------+--------+-------------+-------+----+---------+---------------------+---------------------+
+    |  1 |        4 |        1 |               1 |      0 |           5 |     2 |  1 |       1 | 2016-07-19 09:00:00 | 2016-07-23 17:00:00 |
+    |  2 |        4 |        1 |               1 |      0 |           1 |     1 |  2 |       2 | 2016-07-20 09:00:00 | 2016-07-21 17:00:00 |
+    +----+----------+----------+-----------------+--------+-------------+-------+----+---------+---------------------+---------------------+
+    2 rows in set (0.00 sec)
+    
+//The average amount of windows per Floor
+
+mysql> SELECT floor, AVG (num_windows) FROM room GROUP BY floor;            
+    +-------+-------------------+
+    | floor | AVG (num_windows) |
+    +-------+-------------------+
+    |     1 |            2.0000 |
+    |     2 |            3.2500 |
+    |     3 |            5.0000 |
+    +-------+-------------------+
+    3 rows in set (0.00 sec)
+ 
+// The amount of Floors having Rooms with carpets
+
+mysql> SELECT floor FROM room WHERE carpet = TRUE;
+    +-------+
+    | floor |
+    +-------+
+    |     2 |
+    |     1 |
+    +-------+
+    2 rows in set (0.00 sec)
