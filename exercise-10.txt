@@ -18,7 +18,7 @@ This model should provide answers to the following questions:
     num_windows INT,
     floor INT);
     
-CREATE TABLE availabiilty (
+CREATE TABLE availabiltiy (
     id INT AUTO_INCREMENT PRIMARY KEY,
     room_id INT,
     start_time DATETIME,
